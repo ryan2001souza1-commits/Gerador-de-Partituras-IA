@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gerador de Partituras IA — descreva sua ideia musical em linguagem natural e transforme-a em partitura." />
+  <meta name="theme-color" content="#070b26" />
+  <title>Partitura IA — Crie partituras originais com Inteligência Artificial</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="header" id="topo">
+    <div class="container header__inner">
+      <a class="brand" href="#inicio" aria-label="Partitura IA — Início">
+        <span class="brand__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M9 18.5A3.5 3.5 0 1 1 5.5 15c.8 0 1.5.27 2.1.72V4.5c0-.83.67-1.5 1.5-1.5h9c.83 0 1.5.67 1.5 1.5v11.03a3.5 3.5 0 1 1-1.5-2.87V5H9v13.5z"/></svg>
+        </span>
+        <span class="brand__text">Partitura IA</span>
+      </a>
+
+      <nav class="nav" id="nav-principal" aria-label="Navegação principal">
+        <ul class="nav__list">
+          <li><a class="nav__link is-active" href="#inicio">Início</a></li>
+          <li><a class="nav__link" href="#criar">Gerar</a></li>
+          <li><a class="nav__link" href="#recentes">Minhas Partituras</a></li>
+          <li><a class="nav__link" href="#explorar">Explorar</a></li>
+          <li><a class="nav__link" href="#sobre">Sobre</a></li>
+        </ul>
+      </nav>
+
+      <div class="header__actions">
+        <form class="search" role="search" aria-label="Buscar partituras" onsubmit="return false;">
+          <label class="visually-hidden" for="busca">Buscar partituras</label>
+          <input class="search__input" id="busca" type="search" placeholder="Buscar partituras..." autocomplete="off" />
+          <svg class="search__icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </form>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-label="Alternar para tema escuro"
+          aria-pressed="false"
+          title="Alternar tema"
+        >
+          <span class="theme-toggle__icon" id="theme-icon" aria-hidden="true">☀</span>
+        </button>
+        <div class="account">
+          <span class="avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z"/></svg>
+          </span>
+          <button class="account__btn js-open-auth" type="button">Minha Conta <span aria-hidden="true">▾</span></button>
+          <span class="user-chip" id="user-chip" hidden>Olá, <strong id="user-name"></strong> <button class="link-btn js-logout" type="button">Sair</button></span>
+        </div>
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Abrir menu"
+          aria-expanded="false"
+          aria-controls="nav-mobile"
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="nav-mobile" id="nav-mobile" aria-label="Menu móvel" hidden>
+      <ul class="nav-mobile__list">
+        <li><a class="nav-mobile__link" href="#inicio">Início</a></li>
+        <li><a class="nav-mobile__link" href="#criar">Gerar</a></li>
+        <li><a class="nav-mobile__link" href="#recentes">Minhas Partituras</a></li>
+        <li><a class="nav-mobile__link" href="#explorar">Explorar</a></li>
+        <li><a class="nav-mobile__link" href="#como-funciona">Como funciona</a></li>
+        <li><a class="nav-mobile__link" href="#recursos">Recursos</a></li>
+        <li><a class="nav-mobile__link" href="#sobre">Sobre</a></li>
+        <li class="nav-mobile__cta">
+          <button class="btn btn--ghost btn--block js-open-auth" type="button">Entrar</button>
+          <span class="user-chip" id="user-chip-mobile" hidden>Olá, <strong id="user-name-mobile"></strong> <button class="link-btn js-logout" type="button">Sair</button></span>
+          <a class="btn btn--primary btn--block" href="#criar">Criar partitura</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="conteudo">
+    <!-- HERO + GERADOR (referência) -->
+    <section class="hero" id="inicio" aria-labelledby="hero-titulo">
+      <div class="hero__decor" aria-hidden="true">
+        <span class="hero__note hero__note--1">♪</span>
+        <span class="hero__note hero__note--2">♫</span>
+        <span class="hero__note hero__note--3">♩</span>
+        <span class="hero__note hero__note--4">♬</span>
+        <span class="hero__note hero__note--5">♪</span>
+        <span class="hero__note hero__note--6">♩</span>
+      </div>
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <h1 class="hero__title" id="hero-titulo">Crie partituras originais<br />com <span class="gradient">Inteligência Artificial</span></h1>
+          <p class="hero__text">
+            Transforme suas ideias musicais em partituras completas em segundos.
+            Escolha o estilo, instrumento e deixe a IA compor para você.
+          </p>
+
+          <div id="criar">
+            <form class="gen-panel" id="generator-form" novalidate aria-label="Gerar partitura com IA">
+              <div class="gtabs" role="tablist" aria-label="Modo de criação">
+                <button class="gtab is-active" type="button" role="tab" aria-selected="true" data-gtab="texto" id="gtab-texto" aria-controls="gpanel-texto"><span aria-hidden="true">✎</span> Texto</button>
+                <button class="gtab" type="button" role="tab" aria-selected="false" data-gtab="estilo" id="gtab-estilo" aria-controls="gpanel-estilo" tabindex="-1"><span aria-hidden="true">◐</span> Estilo</button>
+                <button class="gtab" type="button" role="tab" aria-selected="false" data-gtab="audio" id="gtab-audio" aria-controls="gpanel-audio" tabindex="-1"><span aria-hidden="true">▶</span> Exemplo de Áudio</button>
+                <button class="gtab" type="button" role="tab" aria-selected="false" data-gtab="avancado" id="gtab-avancado" aria-controls="gpanel-avancado" tabindex="-1"><span aria-hidden="true">⚙</span> Avançado</button>
+              </div>
+
+              <div class="gpanel" data-gpanel="texto" id="gpanel-texto" role="tabpanel" aria-labelledby="gtab-texto">
+                <div class="field">
+                  <label class="visually-hidden" for="descricao">Descreva sua música</label>
+                  <div class="prompt-box">
+                    <span class="prompt-box__icon" aria-hidden="true">✎</span>
+                    <textarea
+                      class="prompt-box__input"
+                      id="descricao"
+                      name="descricao"
+                      rows="2"
+                      maxlength="2000"
+                      placeholder="Uma valsa calma e simples para piano, estilo clássico."
+                      aria-describedby="dica-descricao contador"
+                    ></textarea>
+                  </div>
+                  <div class="field__meta">
+                    <span class="field__hint" id="dica-descricao">Dica: informe instrumento, estilo, tom e andamento.</span>
+                    <span class="counter" id="contador" aria-live="polite">0 / 2000</span>
+                  </div>
+                </div>
+
+                <div class="sel-grid">
+                  <div class="field">
+                    <label class="field__label" for="instrumento-sel">Instrumento</label>
+                    <select class="field__select" id="instrumento-sel" aria-label="Instrumento">
+                      <option value="Piano" selected>Piano</option>
+                      <option value="Violão">Violão</option>
+                      <option value="Violino">Violino</option>
+                      <option value="Flauta">Flauta</option>
+                      <option value="Baixo">Baixo</option>
+                      <option value="Bateria">Bateria</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="estilo-sel">Estilo</label>
+                    <select class="field__select" id="estilo-sel" aria-label="Estilo">
+                      <option value="Clássico" selected>Clássico</option>
+                      <option value="Romântico">Romântico</option>
+                      <option value="Jazz">Jazz</option>
+                      <option value="Blues">Blues</option>
+                      <option value="Pop">Pop</option>
+                      <option value="Rock">Rock</option>
+                      <option value="Gospel">Gospel</option>
+                      <option value="Cinematográfico">Cinematográfico</option>
+                      <option value="Épico">Épico</option>
+                      <option value="Personalizado">Personalizado</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="compasso-sel">Compasso</label>
+                    <select class="field__select" id="compasso-sel" aria-label="Compasso">
+                      <option value="2/4">2/4</option>
+                      <option value="3/4" selected>3/4 (Valsa)</option>
+                      <option value="4/4">4/4</option>
+                      <option value="6/8">6/8</option>
+                      <option value="12/8">12/8</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="tom">Tonalidade</label>
+                    <select class="field__select" id="tom" name="tom">
+                      <option value="C Maior" selected>Dó (C)</option>
+                      <option value="D Maior">Ré (D)</option>
+                      <option value="E Maior">Mi (E)</option>
+                      <option value="F Maior">Fá (F)</option>
+                      <option value="G Maior">Sol (G)</option>
+                      <option value="A Maior">Lá (A)</option>
+                      <option value="B Maior">Si (B)</option>
+                      <option value="C Menor">Dó Menor (Cm)</option>
+                      <option value="D Menor">Ré Menor (Dm)</option>
+                      <option value="E Menor">Mi Menor (Em)</option>
+                      <option value="F Menor">Fá Menor (Fm)</option>
+                      <option value="G Menor">Sol Menor (Gm)</option>
+                      <option value="A Menor">Lá Menor (Am)</option>
+                      <option value="B Menor">Si Menor (Bm)</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="andamento">Andamento (BPM) <span class="bpm-badge" id="andamento-bpm">96 BPM</span></label>
+                    <select class="field__select" id="andamento" name="andamento">
+                      <option value="Muito lento">Muito lento · 50</option>
+                      <option value="Lento">Lento · 70</option>
+                      <option value="Moderado" selected>Moderado · 96</option>
+                      <option value="Rápido">Rápido · 128</option>
+                      <option value="Muito rápido">Muito rápido · 160</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="compassos-num">Número de compassos</label>
+                    <select class="field__select" id="compassos-num" aria-label="Número de compassos">
+                      <option value="4">4</option>
+                      <option value="8" selected>8</option>
+                      <option value="12">12</option>
+                      <option value="16">16</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="gpanel" data-gpanel="estilo" id="gpanel-estilo" role="tabpanel" aria-labelledby="gtab-estilo" hidden>
+                <fieldset class="field">
+                  <legend class="field__label">Estilo musical</legend>
+                  <div class="pills">
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Clássico" checked /><span>Clássico</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Romântico" /><span>Romântico</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Jazz" /><span>Jazz</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Blues" /><span>Blues</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Pop" /><span>Pop</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Rock" /><span>Rock</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Gospel" /><span>Gospel</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Cinematográfico" /><span>Cinematográfico</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Épico" /><span>Épico</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="estilo" value="Personalizado" /><span>Personalizado</span></label>
+                  </div>
+                </fieldset>
+                <fieldset class="field">
+                  <legend class="field__label">Dificuldade</legend>
+                  <div class="pills">
+                    <label class="pill"><input class="pill__input" type="radio" name="dificuldade" value="Iniciante" checked /><span>Iniciante</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="dificuldade" value="Intermediário" /><span>Intermediário</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="dificuldade" value="Avançado" /><span>Avançado</span></label>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="gpanel" data-gpanel="audio" id="gpanel-audio" role="tabpanel" aria-labelledby="gtab-audio" hidden>
+                <p class="gpanel__text">Ouça a partitura gerada no player ao lado. Use Reproduzir para ouvir, Baixar PDF/MIDI para exportar.</p>
+                <button class="btn btn--ghost-light" type="button" id="ouvir-exemplo">▶ Ouvir exemplo</button>
+              </div>
+
+              <div class="gpanel" data-gpanel="avancado" id="gpanel-avancado" role="tabpanel" aria-labelledby="gtab-avancado" hidden>
+                <fieldset class="field">
+                  <legend class="field__label">Instrumento</legend>
+                  <div class="pills">
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Piano" checked /><span>Piano</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Violão" /><span>Violão</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Violino" /><span>Violino</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Flauta" /><span>Flauta</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Baixo" /><span>Baixo</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Bateria" /><span>Bateria</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="instrumento" value="Outro" /><span>Outro</span></label>
+                  </div>
+                </fieldset>
+                <fieldset class="field">
+                  <legend class="field__label">Compasso</legend>
+                  <div class="pills">
+                    <label class="pill"><input class="pill__input" type="radio" name="compasso" value="2/4" /><span>2/4</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="compasso" value="3/4" checked /><span>3/4</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="compasso" value="4/4" /><span>4/4</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="compasso" value="6/8" /><span>6/8</span></label>
+                    <label class="pill"><input class="pill__input" type="radio" name="compasso" value="12/8" /><span>12/8</span></label>
+                  </div>
+                </fieldset>
+                <p class="gpanel__text">Os campos Tonalidade e Andamento ficam na aba Texto e valem para todas as abas.</p>
+              </div>
+
+              <div class="gen-actions">
+                <button class="btn btn--generate" id="gerar-btn" type="submit">
+                  <span aria-hidden="true">✦</span> Gerar Partitura com IA <span aria-hidden="true">›</span>
+                </button>
+                <p class="gen-feedback" id="gen-feedback" role="status" aria-live="polite" hidden></p>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="hero__preview">
+          <div class="score-preview" id="score-preview">
+            <p class="result-empty" id="resultado-vazio" hidden>Sua partitura aparecerá aqui depois da geração.</p>
+            <div class="result-sim" id="resultado-sim">
+              <p class="preview-meta" id="preview-meta">Piano&nbsp;&nbsp;&nbsp;C Major • 3/4<br />Andamento: 90 BPM</p>
+              <p class="result-song" id="resultado-musica">Valsa da Serenidade</p>
+              <p class="result-sub">Composição gerada por IA</p>
+              <div class="staff staff--sheet" aria-hidden="true">
+                <div class="staff__lines"><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="staff__notes" id="resultado-notas">
+                  <span class="note note--1">♩</span>
+                  <span class="note note--2">♪</span>
+                  <span class="note note--3">♫</span>
+                  <span class="note note--4">♩</span>
+                  <span class="note note--5">♪</span>
+                </div>
+                <span class="clef">𝄞</span>
+              </div>
+              <div class="staff staff--sheet staff--bass" aria-hidden="true">
+                <div class="staff__lines"><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="staff__notes"><span class="note note--1">𝅝</span><span class="note note--3">♩</span><span class="note note--5">♪</span></div>
+                <span class="clef">𝄢</span>
+              </div>
+              <div class="score-card__chips" id="resultado-meta"></div>
+              <ol class="note-list" id="resultado-lista" aria-label="Sequência de notas"></ol>
+              <p class="playback-status" id="playback-status" role="status" aria-live="polite" hidden></p>
+            </div>
+          </div>
+
+          <div class="player" role="group" aria-label="Reprodutor">
+            <button class="player__play" id="play-btn" type="button" aria-label="Reproduzir partitura">▶</button>
+            <button class="player__mini" id="pause-btn" type="button" aria-label="Pausar reprodução" disabled>⏸</button>
+            <button class="player__mini" id="stop-btn" type="button" aria-label="Parar reprodução" disabled>⏹</button>
+            <label class="visually-hidden" for="player-progress">Progresso</label>
+            <input class="player__progress" id="player-progress" type="range" min="0" max="100" value="20" step="1" />
+            <span class="player__time" id="player-time">0:00 / 0:28</span>
+            <span class="player__vol" aria-hidden="true">🔊</span>
+            <label class="visually-hidden" for="volume">Volume</label>
+            <input class="player__volume" id="volume" type="range" min="0" max="100" value="80" step="1" />
+            <button class="player__icon" id="player-download" type="button" aria-label="Baixar partitura em PDF">⤓</button>
+            <button class="player__icon" id="player-expand" type="button" aria-label="Expandir pré-visualização">⛶</button>
+          </div>
+
+          <div class="preview-actions">
+            <button class="btn btn--primary" id="pdf-btn" type="button" aria-label="Baixar partitura em PDF">⤓ Baixar PDF</button>
+            <button class="btn btn--dark-outline" id="musicxml-btn" type="button" aria-label="Baixar partitura em MusicXML">&lt;/&gt; Baixar MusicXML</button>
+            <button class="btn btn--dark-outline" id="midi-btn" type="button" aria-label="Baixar partitura em MIDI">♫ Baixar MIDI</button>
+            <button class="btn btn--dark-outline" id="detalhes-btn" type="button" aria-label="Ver detalhes da partitura">ⓘ Ver Detalhes</button>
+          </div>
+          <div class="preview-edit">
+            <button class="link-btn link-btn--light" type="button" data-future="editar" aria-label="Editar partitura">✏ Editar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAIXA DE RECURSOS -->
+    <section class="features" aria-label="Benefícios">
+      <div class="container features__grid">
+        <div class="feature">
+          <span class="feature__icon" aria-hidden="true">✦</span>
+          <div><p class="feature__title">Composição Original</p><p class="feature__text">Partituras únicas criadas por IA</p></div>
+        </div>
+        <div class="feature">
+          <span class="feature__icon" aria-hidden="true">🎹</span>
+          <div><p class="feature__title">Vários Instrumentos</p><p class="feature__text">Piano, violão, flauta e mais</p></div>
+        </div>
+        <div class="feature">
+          <span class="feature__icon" aria-hidden="true">♪</span>
+          <div><p class="feature__title">Diversos Estilos</p><p class="feature__text">Clássico, popular, jazz, trilhas e mais</p></div>
+        </div>
+        <div class="feature">
+          <span class="feature__icon" aria-hidden="true">🗎</span>
+          <div><p class="feature__title">Download em Múltiplos Formatos</p><p class="feature__text">PDF, MusicXML e MIDI</p></div>
+        </div>
+        <div class="feature">
+          <span class="feature__icon" aria-hidden="true">🎁</span>
+          <div><p class="feature__title">Gratuito para Começar</p><p class="feature__text">Crie suas primeiras partituras sem custo</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECENTES -->
+    <section class="section section--light" id="recentes" aria-labelledby="recentes-titulo">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section__title" id="recentes-titulo"><span aria-hidden="true">◷</span> Minhas Partituras Recentes</h2>
+          <a class="see-all" href="#minhas-partituras">Ver todas <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="rec-grid" id="recentes-grid">
+          <button class="rec-card" type="button" data-exemplo="valsa" data-instrumento="Piano" data-estilo="Clássico">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♩♪♫♩</i></span>
+            <span class="rec-card__title">Valsa da Serenidade <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎹 Piano</span>
+            <span class="rec-card__tags"><b>Clássico</b><b>Valsa</b></span>
+            <span class="rec-card__date">03/10/2026</span>
+          </button>
+          <button class="rec-card" type="button" data-exemplo="noite" data-instrumento="Violão" data-estilo="Pop">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♪♩♫♪</i></span>
+            <span class="rec-card__title">Noite Tranquila <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎸 Violão</span>
+            <span class="rec-card__tags"><b>Popular</b><b>Calmo</b></span>
+            <span class="rec-card__date">02/10/2026</span>
+          </button>
+          <button class="rec-card" type="button" data-exemplo="aventura" data-instrumento="Piano" data-estilo="Cinematográfico">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♫♩♪♬</i></span>
+            <span class="rec-card__title">Tema de Aventura <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎹 Piano</span>
+            <span class="rec-card__tags"><b>Trilha Sonora</b><b>Épico</b></span>
+            <span class="rec-card__date">01/10/2026</span>
+          </button>
+          <button class="rec-card" type="button" data-exemplo="estudo" data-instrumento="Piano" data-estilo="Clássico">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♩♩♪♩</i></span>
+            <span class="rec-card__title">Estudo em Dó Maior <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎹 Piano</span>
+            <span class="rec-card__tags"><b>Estudo</b><b>Clássico</b></span>
+            <span class="rec-card__date">28/09/2026</span>
+          </button>
+          <button class="rec-card" type="button" data-exemplo="manha" data-instrumento="Piano" data-estilo="Pop">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♪♫♩♪</i></span>
+            <span class="rec-card__title">Canção da Manhã <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎹 Piano</span>
+            <span class="rec-card__tags"><b>Popular</b><b>Alegre</b></span>
+            <span class="rec-card__date">26/09/2026</span>
+          </button>
+          <button class="rec-card" type="button" data-exemplo="melodia" data-instrumento="Flauta" data-estilo="Pop">
+            <span class="rec-card__thumb" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i>𝄞 ♩♪♩♫</i></span>
+            <span class="rec-card__title">Melodia Simples <i aria-hidden="true">⋮</i></span>
+            <span class="rec-card__inst">🎷 Flauta</span>
+            <span class="rec-card__tags"><b>Popular</b><b>Calmo</b></span>
+            <span class="rec-card__date">24/09/2026</span>
+          </button>
+        </div>
+
+        <div class="history" id="historico">
+          <h3 class="gen-side__title">Partituras recentes neste navegador</h3>
+          <p class="history__empty" id="historico-vazio">Nenhuma partitura gerada ainda. Suas últimas criações aparecerão aqui, somente neste navegador.</p>
+          <ul class="history__list" id="historico-lista"></ul>
+          <button class="btn btn--ghost btn--sm" id="historico-limpar" type="button" hidden>Limpar histórico</button>
+        </div>
+
+        <div class="history" id="minhas-partituras">
+          <h3 class="gen-side__title">Minhas partituras salvas</h3>
+          <p class="history__empty" id="server-list-login">Entre na sua conta para salvar suas partituras aqui e acessá-las em qualquer dispositivo.</p>
+          <p class="history__empty" id="server-list-empty" hidden>Nenhuma partitura salva ainda. Gere sua primeira acima.</p>
+          <ul class="history__list" id="server-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPLORAR -->
+    <section class="section section--light section--tight" id="explorar" aria-labelledby="explorar-titulo">
+      <div class="container">
+        <h2 class="section__title" id="explorar-titulo"><span aria-hidden="true">🧭</span> Explore Por Estilo</h2>
+        <div class="style-grid">
+          <button class="style-card style-card--classico" type="button" data-estilo="Clássico"><span class="style-card__txt"><b>Clássico</b><i>Valsas, sonatas, estudos...</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+          <button class="style-card style-card--popular" type="button" data-estilo="Pop"><span class="style-card__txt"><b>Popular</b><i>Músicas modernas e tradicionais</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+          <button class="style-card style-card--trilha" type="button" data-estilo="Cinematográfico"><span class="style-card__txt"><b>Trilha Sonora</b><i>Filmes, jogos e histórias</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+          <button class="style-card style-card--jazz" type="button" data-estilo="Jazz"><span class="style-card__txt"><b>Jazz</b><i>Harmonia e improvisação</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+          <button class="style-card style-card--religiosa" type="button" data-estilo="Gospel"><span class="style-card__txt"><b>Religiosa</b><i>Hinos e canções de fé</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+          <button class="style-card style-card--infantil" type="button" data-estilo="Personalizado"><span class="style-card__txt"><b>Infantil</b><i>Melodias simples e educativas</i></span><span class="style-card__go" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="section" id="como-funciona" aria-labelledby="como-funciona-titulo">
+      <div class="container">
+        <p class="section__kicker">Passo a passo</p>
+        <h2 class="section__title" id="como-funciona-titulo">Como funciona</h2>
+        <p class="section__subtitle">Da ideia à partitura em três etapas simples.</p>
+
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">01</span>
+            <h3 class="step__title">Descreva sua ideia</h3>
+            <p class="step__text">Escreva em linguagem natural: instrumento, estilo, tom e andamento. Ex.: “piano, romântico, Dó maior”.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">02</span>
+            <h3 class="step__title">A IA gera sua partitura</h3>
+            <p class="step__text">O modelo interpreta sua descrição e monta a melodia, harmonia e ritmo em notação musical.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">03</span>
+            <h3 class="step__title">Ouça e baixe sua música</h3>
+            <p class="step__text">Reproduza no player, salve no histórico e exporte em PDF, MusicXML ou MIDI.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- RECURSOS -->
+    <section class="section section--alt" id="recursos" aria-labelledby="recursos-titulo">
+      <div class="container">
+        <p class="section__kicker">Recursos</p>
+        <h2 class="section__title" id="recursos-titulo">Tudo para compor sem complicação</h2>
+        <p class="section__subtitle">Ferramentas pensadas para estudantes, compositores e curiosos.</p>
+
+        <div class="cards">
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">𝄞</span>
+            <h3 class="card__title">Geração de partituras</h3>
+            <p class="card__text">Descreva a música com palavras e receba uma partitura estruturada como ponto de partida.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">▶</span>
+            <h3 class="card__title">Reprodução no navegador</h3>
+            <p class="card__text">Ouça sua criação com o player integrado, com pausar e parar.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">🕘</span>
+            <h3 class="card__title">Histórico de projetos</h3>
+            <p class="card__text">Acesse versões anteriores e continue de onde parou, sem perder ideias.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">⤓</span>
+            <h3 class="card__title">Download</h3>
+            <p class="card__text">Exporte sua partitura em PDF, MusicXML ou MIDI para estudar, imprimir ou compartilhar.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">🗂</span>
+            <h3 class="card__title">Organização por projetos</h3>
+            <p class="card__text">Separe composições por instrumento, estilo ou ocasião em projetos organizados.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card__icon" aria-hidden="true">▦</span>
+            <h3 class="card__title">Interface responsiva</h3>
+            <p class="card__text">Crie e revise partituras no desktop, tablet ou celular com a mesma experiência.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXEMPLO / DEMO -->
+    <section class="section" id="exemplo" aria-labelledby="exemplo-titulo">
+      <div class="container">
+        <p class="section__kicker">Demonstração</p>
+        <h2 class="section__title" id="exemplo-titulo">Veja como será o gerador</h2>
+        <p class="section__subtitle">Uma prévia visual da experiência de criação.</p>
+
+        <div class="demo reveal">
+          <div class="demo__prompt">
+            <label class="demo__label" for="demo-input">Descreva sua música</label>
+            <textarea
+              class="demo__input"
+              id="demo-input"
+              rows="4"
+              readonly
+            >Crie uma música para piano, estilo romântico, em Dó maior, andamento moderado.</textarea>
+            <div class="demo__row">
+              <button class="btn btn--primary" id="demo-generate" type="button">Gerar partitura</button>
+              <span class="demo__hint">Demonstração visual — nenhum dado é enviado.</span>
+            </div>
+            <p class="demo__feedback" id="demo-feedback" role="status" aria-live="polite" hidden></p>
+          </div>
+          <div class="demo__preview" aria-hidden="true">
+            <p class="demo__preview-title">Pré-visualização</p>
+            <div class="staff staff--small">
+              <div class="staff__lines"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="staff__notes">
+                <span class="note note--1">♩</span>
+                <span class="note note--2">♪</span>
+                <span class="note note--3">♫</span>
+                <span class="note note--4">♩</span>
+              </div>
+              <span class="clef">𝄞</span>
+            </div>
+            <p class="demo__preview-text">Piano · Dó maior · Moderado</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / SOBRE -->
+    <section class="section cta-section" id="sobre" aria-labelledby="cta-titulo">
+      <div class="container">
+        <div class="cta reveal">
+          <h2 class="cta__title" id="cta-titulo">Pronto para transformar sua ideia em música?</h2>
+          <p class="cta__text">
+            O Gerador de Partituras IA vai ajudar você a sair da ideia solta para a partitura pronta:
+            descreva, gere, ouça e compartilhe. Comece explorando a proposta e acompanhe a evolução do projeto.
+          </p>
+          <a class="btn btn--light btn--lg" href="#criar">Criar minha primeira partitura</a>
+          <p class="cta__note">Sobre o projeto: uma ferramenta em construção para aproximar músicos e tecnologia.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- AUTENTICAÇÃO -->
+  <div class="modal" id="auth-modal" hidden>
+    <div class="modal__backdrop" data-close-auth></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <button class="modal__close" type="button" data-close-auth aria-label="Fechar janela de autenticação">×</button>
+      <h2 class="modal__title" id="auth-title">Entrar</h2>
+      <div class="tabs" role="tablist" aria-label="Alternar entre entrar e cadastrar">
+        <button class="tab is-active" id="tab-login" type="button" role="tab" aria-selected="true" aria-controls="login-form" data-auth-tab="login">Entrar</button>
+        <button class="tab" id="tab-register" type="button" role="tab" aria-selected="false" aria-controls="register-form" data-auth-tab="register">Cadastrar</button>
+      </div>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label class="field__label" for="login-email">E-mail</label>
+          <input class="field__input" id="login-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="login-password">Senha</label>
+          <input class="field__input" id="login-password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <p class="auth-msg" id="login-msg" role="alert" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit">Entrar</button>
+      </form>
+      <form id="register-form" hidden novalidate>
+        <div class="field">
+          <label class="field__label" for="register-name">Nome</label>
+          <input class="field__input" id="register-name" name="name" type="text" autocomplete="name" maxlength="100" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-email">E-mail</label>
+          <input class="field__input" id="register-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-password">Senha (mínimo 8 caracteres)</label>
+          <input class="field__input" id="register-password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required />
+        </div>
+        <p class="auth-msg" id="register-msg" role="alert" hidden></p>
+        <button class="btn btn--primary btn--block" type="submit">Criar conta</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETALHES DA PARTITURA -->
+  <div class="modal" id="detalhes-modal" hidden>
+    <div class="modal__backdrop" data-close-detalhes></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="detalhes-title">
+      <button class="modal__close" type="button" data-close-detalhes aria-label="Fechar detalhes">×</button>
+      <h2 class="modal__title" id="detalhes-title">Detalhes da partitura</h2>
+      <dl class="detalhes-list" id="detalhes-list"></dl>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <p class="brand brand--footer">
+          <span class="brand__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 18.5A3.5 3.5 0 1 1 5.5 15c.8 0 1.5.27 2.1.72V4.5c0-.83.67-1.5 1.5-1.5h9c.83 0 1.5.67 1.5 1.5v11.03a3.5 3.5 0 1 1-1.5-2.87V5H9v13.5z"/></svg>
+          </span>
+          <span class="brand__text">Partitura IA</span>
+        </p>
+        <p class="footer__text">Descreva sua ideia musical e transforme-a em partitura com ajuda da inteligência artificial.</p>
+      </div>
+      <nav class="footer__nav" aria-label="Navegação do rodapé">
+        <p class="footer__heading">Navegação</p>
+        <ul>
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#criar">Gerar</a></li>
+          <li><a href="#recentes">Minhas partituras</a></li>
+          <li><a href="#explorar">Explorar</a></li>
+          <li><a href="#como-funciona">Como funciona</a></li>
+          <li><a href="#sobre">Sobre</a></li>
+        </ul>
+      </nav>
+      <nav class="footer__nav" aria-label="Links legais">
+        <p class="footer__heading">Legal</p>
+        <ul>
+          <li><a href="#" data-action="termos">Termos de uso</a></li>
+          <li><a href="#" data-action="privacidade">Política de privacidade</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="container footer__bottom">
+      <p>© <span id="ano">2026</span> Partitura IA. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>

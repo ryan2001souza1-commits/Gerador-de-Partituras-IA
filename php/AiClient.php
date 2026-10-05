@@ -4,12 +4,11 @@ declare(strict_types=1);
 /**
  * Gerador de Partituras IA — Cliente HTTPS do provedor de IA.
  *
- * Somente stdlib (streams): POST {base}/responses com model,
- * instructions, input e max_output_tokens. Tolera envelope Responses
- * (output/output_text) e, por compatibilidade, o formato Chat
- * Completions (choices/message/content) — útil para gateways como o
- * OpenRouter. Timeout e teto de resposta sempre aplicados. A chave
- * nunca aparece em logs, erros ou respostas.
+ * Transporte cURL: POST {base}/chat/completions com model,
+ * messages (system+user), temperature e max_tokens. Extrai o texto de
+ * choices/message/content (formato Chat) e tolera o envelope Responses
+ * (output/output_text). Timeout total e teto de resposta sempre
+ * aplicados. A chave nunca aparece em logs, erros ou respostas.
  */
 class AiException extends RuntimeException
 {
@@ -61,15 +60,18 @@ class AiClient
     {
         $payload = json_encode([
             'model' => $config['model'],
-            'instructions' => 'Você é um compositor que responde SOMENTE com JSON válido, sem texto antes ou depois, sem markdown.',
-            'input' => $prompt,
+            'messages' => [
+                ['role' => 'system', 'content' => 'Você é um compositor que responde SOMENTE com JSON válido, sem texto antes ou depois, sem markdown.'],
+                ['role' => 'user', 'content' => $prompt],
+            ],
             'temperature' => 0.7,
-            'max_output_tokens' => 4000,
+            'max_tokens' => 4000,
+            'chat_template_kwargs' => ['enable_thinking' => false],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($payload === false) {
             throw new AiException(self::UNAVAILABLE);
         }
-        $ch = curl_init($config['base_url'] . '/responses');
+        $ch = curl_init($config['base_url'] . '/chat/completions');
         if ($ch === false) {
             throw new AiException(self::UNAVAILABLE);
         }
@@ -77,7 +79,7 @@ class AiClient
         // tempos e códigos. Nenhum segredo, prompt, payload ou resposta.
         $dbgTimeout = 55;
         $dbgConnectTimeout = 10;
-        $dbgParts = parse_url($config['base_url'] . '/responses');
+        $dbgParts = parse_url($config['base_url'] . '/chat/completions');
         error_log('[gpi-ai-debug] curl-config timeout=' . $dbgTimeout
             . ' connect_timeout=' . $dbgConnectTimeout
             . ' url=' . (($dbgParts['host'] ?? '?') . ($dbgParts['path'] ?? '')));
