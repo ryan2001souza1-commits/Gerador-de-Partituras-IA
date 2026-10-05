@@ -73,10 +73,18 @@ class AiClient
         if ($ch === false) {
             throw new AiException(self::UNAVAILABLE);
         }
+        // Instrumentação temporária (debug do timeout de 25s): só estágio,
+        // tempos e códigos. Nenhum segredo, prompt, payload ou resposta.
+        $dbgTimeout = 25;
+        $dbgConnectTimeout = 10;
+        $dbgParts = parse_url($config['base_url'] . '/responses');
+        error_log('[gpi-ai-debug] curl-config timeout=' . $dbgTimeout
+            . ' connect_timeout=' . $dbgConnectTimeout
+            . ' url=' . (($dbgParts['host'] ?? '?') . ($dbgParts['path'] ?? '')));
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 25,
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => $dbgTimeout,
+            CURLOPT_CONNECTTIMEOUT => $dbgConnectTimeout,
             CURLOPT_POST => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
@@ -85,13 +93,23 @@ class AiClient
             ],
             CURLOPT_POSTFIELDS => $payload,
         ]);
+        error_log('[gpi-ai-debug] curl-start');
+        $dbgT0 = microtime(true);
         $raw = curl_exec($ch);
+        $dbgMs = (int) round((microtime(true) - $dbgT0) * 1000);
         if ($raw === false) {
+            error_log('[gpi-ai-debug] curl-end elapsed_ms=' . $dbgMs
+                . ' http_code=0 errno=' . curl_errno($ch)
+                . ' error=' . substr((string) curl_error($ch), 0, 100)
+                . ' response_bytes=0');
             curl_close($ch);
             throw new AiException(self::UNAVAILABLE);
         }
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        error_log('[gpi-ai-debug] curl-end elapsed_ms=' . $dbgMs
+            . ' http_code=' . $status . ' errno=0 error='
+            . ' response_bytes=' . strlen($raw));
         if (!is_string($raw) || $raw === '') {
             throw new AiException(self::UNAVAILABLE);
         }
