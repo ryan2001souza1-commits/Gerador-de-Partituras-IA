@@ -75,7 +75,7 @@ class AiClient
         }
         // Instrumentação temporária (debug do timeout de 25s): só estágio,
         // tempos e códigos. Nenhum segredo, prompt, payload ou resposta.
-        $dbgTimeout = 25;
+        $dbgTimeout = 55;
         $dbgConnectTimeout = 10;
         $dbgParts = parse_url($config['base_url'] . '/responses');
         error_log('[gpi-ai-debug] curl-config timeout=' . $dbgTimeout
