@@ -92,9 +92,6 @@ class Database
             }
         }
         $dsn = sprintf('pgsql:host=%s;port=%d;dbname=%s;sslmode=%s', $host, $port, $dbname, $sslmode);
-        if (function_exists('gpi_dbg_step')) {
-            gpi_dbg_step(5, 'db-connect-start');
-        }
         try {
             $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

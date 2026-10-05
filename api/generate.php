@@ -65,16 +65,6 @@ require_once __DIR__ . '/../php/Database.php';
 require_once __DIR__ . '/../php/AiClient.php';
 require_once __DIR__ . '/../php/ScoreFactory.php';
 
-/* ---------- Instrumentação temporária (debug de travamento) ----------
- * Somente error_log com rótulos fixos + tempo decorrido. Nenhum dado,
- * segredo, prompt ou resposta é registrado. Remover após o diagnóstico. */
-$GLOBALS['gpi_dbg_t0'] = microtime(true);
-function gpi_dbg_step(int $step, string $label): void
-{
-    $t0 = $GLOBALS['gpi_dbg_t0'] ?? microtime(true);
-    error_log('[gpi-debug] STEP ' . $step . ' ' . $label
-        . ' +' . (int) round((microtime(true) - $t0) * 1000) . 'ms');
-}
 $validation = gpi_validate_score_input($data);
 if (!$validation['valid']) {
     gpi_respond(400, ['success' => false, 'error' => $validation['error']]);
@@ -85,7 +75,6 @@ $payload = $validation['data'];
 // Sem proc_open/exec: na Vercel não há Python no ambiente da função PHP.
 // Com AI_API_KEY => OpenRouter/Responses; sem chave => gerador local.
 // Falha da IA => erro controlado exato, SEM fallback silencioso.
-gpi_dbg_step(1, 'generate-start');
 $aiConfig = AiClient::config();
 if ($aiConfig === null) {
     $score = ScoreFactory::buildLocal($payload);
@@ -94,9 +83,7 @@ if ($aiConfig === null) {
     $result = ['success' => true, 'message' => $message, 'score' => $score, 'meta' => $meta];
 } else {
     try {
-        gpi_dbg_step(2, 'ai-start');
         $aiResp = AiClient::generate(ScoreFactory::buildPrompt($payload), $aiConfig);
-        gpi_dbg_step(3, 'ai-end');
         $rawScore = AiClient::extractJson($aiResp['text']);
         $score = ScoreFactory::normalizeAiScore($rawScore, $payload, $aiResp);
         $result = [
@@ -127,7 +114,6 @@ if (!is_array($notes) || $notes === []) {
 // Somente quando há cookie de sessão: o user_id vem EXCLUSIVAMENTE da
 // sessão PHP (nunca do frontend). Falha aqui não cancela a geração.
 $scoreId = null;
-gpi_dbg_step(4, 'persistence-start');
 if (isset($_COOKIE[GPI_SESSION_NAME])) {
     try {
         $sessionUser = gpi_current_user();
@@ -138,7 +124,6 @@ if (isset($_COOKIE[GPI_SESSION_NAME])) {
                     ? mb_substr($payload['descricao'], 0, 80, 'UTF-8')
                     : substr($payload['descricao'], 0, 80)
             );
-            gpi_dbg_step(6, 'db-operation-start');
             $saved = Database::createScore($sessionUser['id'], [
                 'title' => $title !== '' ? $title : 'Sem título',
                 'description' => $payload['descricao'],
@@ -164,17 +149,13 @@ if (isset($_COOKIE[GPI_SESSION_NAME])) {
                 if (isset($gen['id'])) {
                     Database::completeGeneration((string) $gen['id'], 'completed', $result['score']);
                 }
-                gpi_dbg_step(7, 'db-operation-end');
             }
         }
     } catch (Throwable $e) {
         error_log('[gpi] persistência da partitura falhou (best-effort).');
     }
 }
-gpi_dbg_step(8, 'persistence-end');
-
 /* ---------- 7. Resposta de sucesso ---------- */
-gpi_dbg_step(9, 'generate-end');
 gpi_respond(200, [
     'success' => true,
     'message' => isset($result['message']) && is_string($result['message']) ? $result['message'] : 'Solicitação processada.',
