@@ -180,7 +180,7 @@ GitHub repository
 ↓ (manual via Actions, ou release publicada — nunca push em main)
 GitHub Actions (.github/workflows/worker-image.yml)
 ↓ (build CPU ou GPU + cache BuildKit)
-GHCR (ghcr.io/ryan2001souzal-commits/gerador-de-partituras-ia-worker)
+GHCR (ghcr.io/ryan2001souza1-commits/gerador-de-partituras-ia-worker)
 ↓
 RunPod (imagem fixada por tag imutável)
 ```
