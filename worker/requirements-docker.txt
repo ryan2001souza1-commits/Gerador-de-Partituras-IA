@@ -35,7 +35,10 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 pillow==12.3.0
 mpmath==1.3.0
-sympy==1.14.0
+# torch 2.5.1+cu121 (GPU) exige sympy==1.13.1 exato, enquanto o torch
+# CPU exige sympy>=1.13.3: faixa única que resolve para ambas as
+# variantes (GPU fixa em 1.13.1, CPU resolve a mais nova <1.15).
+sympy>=1.13.1,<1.15
 typing-extensions==4.16.0
 annotated-types==0.8.0
 annotated-doc==0.0.5
