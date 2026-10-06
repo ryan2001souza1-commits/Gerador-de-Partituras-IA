@@ -4,6 +4,74 @@ Este documento descreve como publicar o worker **posteriormente** na
 RunPod (ou qualquer host Docker com GPU NVIDIA). Nada aqui executa
 nada sozinho; nenhum secret real está neste arquivo.
 
+## Deploy manual no RunPod — ainda não executado
+
+### Imagens já publicadas no GHCR (GitHub Actions → GHCR)
+
+| Variante | Imagem |
+|---|---|
+| CPU | `ghcr.io/ryan2001souza1-commits/gerador-de-partituras-ia-worker:latest` |
+| GPU | `ghcr.io/ryan2001souza1-commits/gerador-de-partituras-ia-worker:gpu` |
+
+> **Importante**: os pacotes GHCR são **privados por padrão**. No RunPod,
+> configure as credenciais de leitura do GHCR (Settings → Registry Credentials)
+> ou torne o pacote público nas configurações do pacote GitHub.
+> O `WORKER_WEBHOOK_SECRET` continua sendo variável de ambiente em runtime,
+> nunca camada da imagem.
+
+### Passo a passo para criar o Pod
+
+1. **RunPod → Pods → Deploy** (ou "Deploy from Template" se já salvou).
+2. **Container Image**: cole a imagem GPU (recomendada):
+   ```
+   ghcr.io/ryan2001souza1-commits/gerador-de-partituras-ia-worker:gpu
+   ```
+3. **GPU Type**: qualquer NVIDIA com CUDA 12.1+ (ex. RTX 3090, RTX 4090, A40, A100).
+   - Sem GPU o worker cai para CPU automaticamente (fallback).
+4. **Container Port**: `8001` (o worker escuta em `0.0.0.0:8001`; a RunPod injeta `PORT`).
+5. **Volume (recomendado)**: montar **Network Volume** em
+   `/home/appuser/.cache` para persistir PANNs (~313 MB) + Demucs.
+   - Sem volume: modelos baixam no primeiro job (funciona, só mais lento).
+6. **Environment Variables** (em "Environment Variables" do pod):
+   ```
+   WORKER_WEBHOOK_SECRET=<mesmo segredo da API Vercel>
+   PORT=8001
+   # Opcionais:
+   # AUDIO_MAX_BYTES=26214400
+   # DEMUCS_MODEL=htdemucs
+   # DEMUCS_DEVICE=auto
+   # DEMUCS_TIMEOUT_S=600
+   ```
+7. **Registry Credentials** (se imagem privada): clique em "Add Registry Credentials"
+   e informe `ghcr.io` + username + PAT com `read:packages`.
+8. **Deploy** → aguardar "Running" → anotar **Public URL**, ex.:
+   `https://<pod-id>-8001.proxy.runpod.net`
+
+### Healthcheck e teste rápido
+
+```bash
+BASE=https://<pod-id>-8001.proxy.runpod.net
+
+# Health (sem auth; retorna device: cuda|cpu)
+curl $BASE/health
+# → {"ok":true,"service":"audio-worker","device":"cuda"}
+
+# Transcrição (aceite imediato; processa em background)
+curl -X POST $BASE/jobs/transcribe \
+  -H 'Content-Type: application/json' \
+  -d '{"job_id":"teste-123","audio_source_id":"src-1",
+       "audio_url":"https://exemplo.test/a.wav",
+       "callback_url":"https://sua-api.test/api/transcription/webhook"}'
+# → {"accepted":true,"job_id":"teste-123","status":"queued"}
+```
+
+### Conectar ao Vercel (etapa futura)
+
+Na Vercel, defina `WORKER_BASE_URL` = `https://<pod-id>-8001.proxy.runpod.net`
+(sem barra final). O dispatch PHP passará a enviar jobs para o worker real.
+
+---
+
 ## 1. Pré-requisitos
 
 - Imagem `gpi-worker` construída a partir de `worker/Dockerfile`
