@@ -319,7 +319,7 @@ docker run --rm -p 8001:8001 \
 docker build -t gpi-worker:gpu ./worker \
   --build-arg BASE_IMAGE=nvidia/cuda:12.1.1-runtime-ubuntu22.04 \
   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121 \
-  --build-arg TORCH_VERSION=2.14.1+cu121
+  --build-arg TORCH_VERSION=2.5.1+cu121
 docker run --rm --gpus all -p 8001:8001 \
   -e WORKER_WEBHOOK_SECRET=... \
   -v gpi-models:/home/appuser/.cache \

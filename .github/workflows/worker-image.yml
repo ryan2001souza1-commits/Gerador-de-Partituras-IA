@@ -65,7 +65,7 @@ jobs:
             # Variante GPU documentada no Dockerfile (CUDA 12.1/cu121).
             # Nunca publica CUDA como :latest (evita trocar a CPU sob
             # os pés de quem usa a tag mutável).
-            ARGS="BASE_IMAGE=nvidia/cuda:12.1.1-runtime-ubuntu22.04,TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121,TORCH_VERSION=2.14.1+cu121"
+            ARGS="BASE_IMAGE=nvidia/cuda:12.1.1-runtime-ubuntu22.04,TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121,TORCH_VERSION=2.5.1+cu121"
             TAGS="${IMAGE}:gpu"
             if [ -n "${{ inputs.tag }}" ]; then
               TAGS="${TAGS},${IMAGE}:${{ inputs.tag }}-gpu"

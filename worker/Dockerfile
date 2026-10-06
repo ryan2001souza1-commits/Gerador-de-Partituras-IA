@@ -12,7 +12,7 @@
 #     --build-arg BASE_IMAGE=nvidia/cuda:12.1.1-runtime-ubuntu22.04 \
 #     --build-arg PYTHON_BIN=python3 \
 #     --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121 \
-#     --build-arg TORCH_VERSION=2.14.1+cu121
+#     --build-arg TORCH_VERSION=2.5.1+cu121
 #   (na base CUDA o apt instala o Python 3.10; o separador usa CUDA
 #   sozinho quando torch.cuda.is_available(), senão cai para CPU.)
 #
