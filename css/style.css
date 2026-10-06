@@ -1190,3 +1190,82 @@ fieldset.field .field__label { padding: 0; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none; transition: none; }
 }
+
+/* ---------- FASE 3N: áudio → partitura ---------- */
+.audio2__panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 1.4rem;
+  display: grid;
+  gap: 0.9rem;
+  max-width: 760px;
+}
+.audio2__fileinfo { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+.audio2__fileinfo[hidden] { display: none; }
+.audio2__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.audio2__progress { display: grid; gap: 0.2rem; }
+.audio2__progress[hidden] { display: none; }
+.audio2__stage { margin: 0; font-weight: 600; }
+.audio2__pct { margin: 0; color: var(--text-muted); }
+.audio2__result { display: grid; gap: 0.8rem; }
+.audio2__result[hidden] { display: none; }
+.audio2__result-title { margin: 0; font-size: 1.25rem; }
+.audio2__result-state { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+.audio2__meta { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
+.audio2__meta dt { font-weight: 600; }
+.audio2__meta dd { margin: 0; }
+.audio2__subtitle { margin: 0.4rem 0 0; font-size: 1rem; }
+.audio2__list { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.audio2__item { font-size: 0.92rem; }
+.audio2__badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.audio2__notes { margin: 0; font-weight: 600; }
+.audio2__preview {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.audio2__preview p { margin: 0; }
+.audio2__warnings {
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: rgba(245, 185, 66, 0.08);
+}
+@media (min-width: 720px) {
+  .audio2__panel { padding: 1.8rem; }
+}
+
+/* ---------- FASE 3O: seleção de instrumentos ---------- */
+.audio2__selection[hidden] { display: none; }
+.audio2__selection { display: grid; gap: 0.8rem; }
+.audio2__cards { display: grid; gap: 0.6rem; }
+.audio2__card {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  background: var(--surface);
+}
+.audio2__card input[type="checkbox"] { width: 1.1rem; height: 1.1rem; margin-top: 0.15rem; }
+.audio2__card-label { font-weight: 600; cursor: pointer; }
+.audio2__card-desc { display: block; font-weight: 400; font-size: 0.85rem; color: var(--text-muted); }
+.audio2__card--unknown { opacity: 0.85; }
+.audio2__track { margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
+.audio2__counter { margin: 0; font-size: 0.88rem; color: var(--text-muted); }
+@media (min-width: 720px) {
+  .audio2__cards { grid-template-columns: repeat(2, 1fr); }
+}

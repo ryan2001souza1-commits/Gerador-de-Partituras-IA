@@ -104,11 +104,9 @@ class AiClient
                 . ' http_code=0 errno=' . curl_errno($ch)
                 . ' error=' . substr((string) curl_error($ch), 0, 100)
                 . ' response_bytes=0');
-            curl_close($ch);
             throw new AiException(self::UNAVAILABLE);
         }
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         error_log('[gpi-ai-debug] curl-end elapsed_ms=' . $dbgMs
             . ' http_code=' . $status . ' errno=0 error='
             . ' response_bytes=' . strlen($raw));

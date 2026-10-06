@@ -360,78 +360,127 @@ class ScorePdf
     public static function render(array $score): string
     {
         $s = self::normalize($score);
+        $st = ['canvas' => new PdfCanvas(), 'yTop' => self::PAGE_H - 150, 'pages' => [], 'pageNum' => 1];
+        self::headerFirstPage($st['canvas'], $s);
+        $x = self::openSystem($st['canvas'], $st['yTop'], $s, true);
+        $beatUsed = 0.0;
+        self::flowNotes($st, $s, $x, $beatUsed);
+        self::finalBar($st['canvas'], $x, $st['yTop']);
+        $st['pages'][] = $st['canvas']->s;
+        return self::finishDoc($st['pages']);
+    }
+
+    /**
+     * Gera PDF multi-partes (FASE 3Q): título uma única vez + uma
+     * seção rotulada por parte, na ordem recebida (determinística).
+     * Reutiliza os mesmos primitivos e layout de render().
+     */
+    public static function renderParts(array $scores, array $subtitles = []): string
+    {
+        if ($scores === [] || count($scores) > 16) {
+            throw new InvalidArgumentException('Partitura precisa de 1 a 16 partes.');
+        }
+        $parts = [];
+        foreach (array_values($scores) as $score) {
+            if (!is_array($score)) {
+                throw new InvalidArgumentException('Parte inválida para o PDF.');
+            }
+            $parts[] = self::normalize($score);
+        }
+        $first = $parts[0];
+        $st = ['canvas' => new PdfCanvas(), 'yTop' => self::PAGE_H - 150, 'pages' => [], 'pageNum' => 1];
+        self::headerFirstPage($st['canvas'], $first);
+        foreach ($parts as $i => $s) {
+            $label = isset($subtitles[$i]) && is_string($subtitles[$i]) && $subtitles[$i] !== ''
+                ? $subtitles[$i] : ('Parte ' . ($i + 1) . ' — ' . $s['instrument']);
+            // Garante espaço para rótulo + ao menos um sistema.
+            if ($st['yTop'] - 2 * self::SYSTEM_H < 70) {
+                $st['pages'][] = $st['canvas']->s;
+                $st['canvas'] = new PdfCanvas();
+                $st['pageNum']++;
+                $st['yTop'] = self::PAGE_H - 90;
+            }
+            $st['canvas']->text(self::MARGIN, $st['yTop'] + 6, $label, 12, 'F2');
+            $st['yTop'] -= 30;
+            $x = self::openSystem($st['canvas'], $st['yTop'], $s, ($i === 0));
+            $beatUsed = 0.0;
+            self::flowNotes($st, $s, $x, $beatUsed);
+            self::finalBar($st['canvas'], $x, $st['yTop']);
+            $st['yTop'] -= self::SYSTEM_H;
+        }
+        $st['pages'][] = $st['canvas']->s;
+        return self::finishDoc($st['pages']);
+    }
+
+    /** Cabeçalho global (título + linha do instrumento): só 1ª página. */
+    private static function headerFirstPage(PdfCanvas $c, array $s): void
+    {
+        $c->text(self::MARGIN, self::PAGE_H - 62, $s['title'], 17, 'F2');
+        $c->text(self::MARGIN, self::PAGE_H - 82,
+            $s['instrument'] . '  ·  Tom: ' . $s['tom'] . '  ·  ' . $s['bpm'] . ' BPM  ·  Compasso: ' . $s['compasso'], 11, 'F1');
+        $c->text(self::MARGIN, self::PAGE_H - 98,
+            'Estilo: ' . $s['estilo'] . '  ·  Dificuldade: ' . $s['dificuldade'], 10, 'F1');
+    }
+
+    /** Abre um sistema (pauta + clave + fórmula no primeiro). */
+    private static function openSystem(PdfCanvas $c, float $y, array $s, bool $firstSystem): float
+    {
+        for ($k = 0; $k < 5; $k++) {
+            $ly = $y - $k * ScorePdf::GAP;
+            $c->line(ScorePdf::MARGIN, $ly, ScorePdf::PAGE_W - ScorePdf::MARGIN, $ly, 1.0);
+        }
+        $yG = $y - 3 * ScorePdf::GAP;
+        ScorePdf::drawClef($c, ScorePdf::MARGIN + 8, $yG);
+        $x = ScorePdf::MARGIN + 46;
+        if ($firstSystem) {
+            [$num, $den] = explode('/', $s['compasso']);
+            $c->text($x, $y - 2 * ScorePdf::GAP + 3, $num, 13, 'F2');
+            $c->text($x, $y - 4 * ScorePdf::GAP + 3, $den, 13, 'F2');
+            $x += 24;
+        }
+        return $x;
+    }
+
+    /** Fluxo de notas com quebra de sistema/página e barras. */
+    private static function flowNotes(array &$st, array $s, float &$x, float &$beatUsed): void
+    {
         $staffW = self::PAGE_W - 2 * self::MARGIN;
         $measureBeats = self::MEASURE_BEATS[$s['compasso']];
-
-        $pages = [];
-        $canvas = new PdfCanvas();
-        $yTop = self::PAGE_H - 150; // após o cabeçalho da 1ª página
-
-        $header = function (PdfCanvas $c, bool $first) use ($s) {
-            if (!$first) {
-                return;
-            }
-            $c->text(self::MARGIN, self::PAGE_H - 62, $s['title'], 17, 'F2');
-            $c->text(self::MARGIN, self::PAGE_H - 82,
-                $s['instrument'] . '  ·  Tom: ' . $s['tom'] . '  ·  ' . $s['bpm'] . ' BPM  ·  Compasso: ' . $s['compasso'], 11, 'F1');
-            $c->text(self::MARGIN, self::PAGE_H - 98,
-                'Estilo: ' . $s['estilo'] . '  ·  Dificuldade: ' . $s['dificuldade'], 10, 'F1');
-        };
-
-        $newSystem = function (PdfCanvas $c, float $y, bool $firstSystem) use ($s) {
-            for ($k = 0; $k < 5; $k++) {
-                $ly = $y - $k * ScorePdf::GAP;
-                $c->line(ScorePdf::MARGIN, $ly, ScorePdf::PAGE_W - ScorePdf::MARGIN, $ly, 1.0);
-            }
-            $yG = $y - 3 * ScorePdf::GAP;
-            ScorePdf::drawClef($c, ScorePdf::MARGIN + 8, $yG);
-            $x = ScorePdf::MARGIN + 46;
-            if ($firstSystem) {
-                [$num, $den] = explode('/', $s['compasso']);
-                $c->text($x, $y - 2 * ScorePdf::GAP + 3, $num, 13, 'F2');
-                $c->text($x, $y - 4 * ScorePdf::GAP + 3, $den, 13, 'F2');
-                $x += 24;
-            }
-            return $x;
-        };
-
-        $pageNum = 1;
-        $header($canvas, true);
-        $x = $newSystem($canvas, $yTop, true);
-        $beatUsed = 0.0;
-
+        /** @var PdfCanvas $canvas */
+        $canvas = $st['canvas'];
         foreach ($s['notes'] as $note) {
             $beats = self::BEATS[$note['duration']];
             // Quebra de sistema / página antes de estourar a largura.
             if ($x + self::NOTE_DX > self::MARGIN + $staffW) {
-                $canvas->line($x, $yTop - 4 * self::GAP, $x, $yTop, 1.2); // barra final do sistema
-                $yTop -= self::SYSTEM_H;
-                if ($yTop - 4 * self::GAP < 70) {
-                    $pages[] = $canvas->s;
+                $canvas->line($x, $st['yTop'] - 4 * self::GAP, $x, $st['yTop'], 1.2); // barra final do sistema
+                $st['yTop'] -= self::SYSTEM_H;
+                if ($st['yTop'] - 4 * self::GAP < 70) {
+                    $st['pages'][] = $canvas->s;
                     $canvas = new PdfCanvas();
-                    $pageNum++;
-                    $yTop = self::PAGE_H - 90;
+                    $st['canvas'] = $canvas;
+                    $st['pageNum']++;
+                    $st['yTop'] = self::PAGE_H - 90;
                 }
-                $x = $newSystem($canvas, $yTop, false);
+                $x = self::openSystem($canvas, $st['yTop'], $s, false);
                 $beatUsed = 0.0;
             }
             // Barra de compasso quando o compasso encheu.
             if ($beatUsed >= $measureBeats - 1e-9) {
-                $canvas->line($x - 7, $yTop - 4 * self::GAP, $x - 7, $yTop, 1.2);
+                $canvas->line($x - 7, $st['yTop'] - 4 * self::GAP, $x - 7, $st['yTop'], 1.2);
                 $beatUsed = 0.0;
             }
             $x += 7;
             if ($note['rest']) {
-                self::drawRest($canvas, $x, $yTop, $note['duration']);
+                self::drawRest($canvas, $x, $st['yTop'], $note['duration']);
             } else {
                 $step = self::step($note);
-                $y = $yTop - 4 * self::GAP + $step * self::STEP;
+                $y = $st['yTop'] - 4 * self::GAP + $step * self::STEP;
                 // Linhas suplementares.
                 for ($ls = -2; $ls >= $step; $ls -= 2) {
-                    $canvas->line($x - 9, $yTop - 4 * self::GAP + $ls * self::STEP, $x + 9, $yTop - 4 * self::GAP + $ls * self::STEP, 1.0);
+                    $canvas->line($x - 9, $st['yTop'] - 4 * self::GAP + $ls * self::STEP, $x + 9, $st['yTop'] - 4 * self::GAP + $ls * self::STEP, 1.0);
                 }
                 for ($ls = 10; $ls <= $step; $ls += 2) {
-                    $canvas->line($x - 9, $yTop - 4 * self::GAP + $ls * self::STEP, $x + 9, $yTop - 4 * self::GAP + $ls * self::STEP, 1.0);
+                    $canvas->line($x - 9, $st['yTop'] - 4 * self::GAP + $ls * self::STEP, $x + 9, $st['yTop'] - 4 * self::GAP + $ls * self::STEP, 1.0);
                 }
                 if (strpos($note['pitch'], '#') !== false) {
                     self::drawSharp($canvas, $x - 11, $y);
@@ -446,11 +495,18 @@ class ScorePdf
             $x += self::NOTE_DX;
             $beatUsed += $beats;
         }
-        // Barra final.
-        $canvas->line($x - 7, $yTop - 4 * self::GAP, $x - 7, $yTop, 1.4);
-        $canvas->line($x - 4, $yTop - 4 * self::GAP, $x - 4, $yTop, 2.6);
-        $pages[] = $canvas->s;
+    }
 
+    /** Barra final dupla. */
+    private static function finalBar(PdfCanvas $c, float $x, float $yTop): void
+    {
+        $c->line($x - 7, $yTop - 4 * self::GAP, $x - 7, $yTop, 1.4);
+        $c->line($x - 4, $yTop - 4 * self::GAP, $x - 4, $yTop, 2.6);
+    }
+
+    /** Monta o documento a partir das páginas. */
+    private static function finishDoc(array $pages): string
+    {
         // Monta o documento.
         $w = new PdfWriter();
         $w->addRaw('<< /Type /Catalog /Pages 2 0 R >>'); // 1

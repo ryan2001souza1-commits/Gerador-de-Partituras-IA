@@ -113,7 +113,15 @@ class MidiWriter
     /** Monta o arquivo .mid final. */
     public function build(): string
     {
-        usort($this->events, function ($a, $b) {
+        $track = self::serializeEvents($this->events);
+        $header = 'MThd' . pack('N', 6) . pack('n', 0) . pack('n', 1) . pack('n', $this->division);
+        return $header . 'MTrk' . pack('N', strlen($track)) . $track;
+    }
+
+    /** Serializa eventos {tick, seq, bytes} em corpo de MTrk. */
+    public static function serializeEvents(array $events): string
+    {
+        usort($events, function ($a, $b) {
             if ($a['tick'] === $b['tick']) {
                 return $a['seq'] <=> $b['seq'];
             }
@@ -121,12 +129,25 @@ class MidiWriter
         });
         $track = '';
         $last = 0;
-        foreach ($this->events as $ev) {
-            $track .= self::vlq($ev['tick'] - $last) . $ev['bytes'];
+        foreach ($events as $ev) {
+            $track .= self::vlq(max(0, $ev['tick'] - $last)) . $ev['bytes'];
             $last = $ev['tick'];
         }
         $track .= "\x00\xFF\x2F\x00"; // fim de trilha
-        $header = 'MThd' . pack('N', 6) . pack('n', 0) . pack('n', 1) . pack('n', $this->division);
-        return $header . 'MTrk' . pack('N', strlen($track)) . $track;
+        return $track;
+    }
+
+    /**
+     * Monta SMF formato 1 multi-track (FASE 3P, aditivo).
+     * $tracks: lista de corpos MTrk já serializados (ver serializeEvents).
+     */
+    public static function buildFormat1(array $tracks, int $division = 480): string
+    {
+        $division = $division > 0 ? $division : 480;
+        $out = 'MThd' . pack('N', 6) . pack('n', 1) . pack('n', count($tracks)) . pack('n', $division);
+        foreach ($tracks as $body) {
+            $out .= 'MTrk' . pack('N', strlen($body)) . $body;
+        }
+        return $out;
     }
 }

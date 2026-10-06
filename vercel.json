@@ -1,8 +1,24 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/*.php": {
+    "api/**/*.php": {
       "runtime": "vercel-php@0.9.0"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/audio/upload", "destination": "/api/audio-router?op=upload" },
+    { "source": "/api/audio/upload.php", "destination": "/api/audio-router?op=upload" },
+    { "source": "/api/audio/signed-url", "destination": "/api/audio-router?op=signed" },
+    { "source": "/api/audio/signed-url.php", "destination": "/api/audio-router?op=signed" },
+    { "source": "/api/transcription/webhook", "destination": "/api/transcription-router?op=webhook" },
+    { "source": "/api/transcription/webhook.php", "destination": "/api/transcription-router?op=webhook" },
+    { "source": "/api/transcription/status", "destination": "/api/transcription-router?op=status" },
+    { "source": "/api/transcription/status.php", "destination": "/api/transcription-router?op=status" },
+    { "source": "/api/transcription/dispatch", "destination": "/api/transcription-router?op=dispatch" },
+    { "source": "/api/transcription/dispatch.php", "destination": "/api/transcription-router?op=dispatch" },
+    { "source": "/api/transcription/select", "destination": "/api/transcription-router?op=select" },
+    { "source": "/api/transcription/select.php", "destination": "/api/transcription-router?op=select" },
+    { "source": "/api/transcription/generate", "destination": "/api/transcription-router?op=generate" },
+    { "source": "/api/transcription/generate.php", "destination": "/api/transcription-router?op=generate" }
+  ]
 }

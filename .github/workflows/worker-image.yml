@@ -1,0 +1,88 @@
+# Worker → GHCR (FASE 3I). NUNCA publica em push na main:
+# somente manual (workflow_dispatch) ou release publicada.
+# Usa GITHUB_TOKEN nativo; nenhum PAT/secret no código.
+# GitHub Actions NÃO precisa de GPU para BUILDAR a imagem CUDA —
+# a GPU só é usada depois, na execução no RunPod.
+
+name: worker-image
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: "Variante da imagem (cpu ou gpu)"
+        required: false
+        default: "cpu"
+        type: choice
+        options:
+          - cpu
+          - gpu
+      tag:
+        description: "Tag extra opcional (ex. v1.0.0). Sempre publica latest também."
+        required: false
+        default: ""
+        type: string
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/ryan2001souzal-commits/gerador-de-partituras-ia-worker
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Definir tags e build args
+        id: meta
+        run: |
+          TAGS="${IMAGE}:latest"
+          ARGS=""
+          if [ "${{ github.event_name }}" = "release" ]; then
+            # Release: tag imutável da versão (produção fixa nela).
+            TAGS="${TAGS},${IMAGE}:${{ github.event.release.tag_name }}"
+          fi
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAGS="${TAGS},${IMAGE}:${{ inputs.tag }}"
+          fi
+          if [ "${{ inputs.variant }}" = "gpu" ]; then
+            # Variante GPU documentada no Dockerfile (CUDA 12.1/cu121).
+            # Nunca publica CUDA como :latest (evita trocar a CPU sob
+            # os pés de quem usa a tag mutável).
+            ARGS="BASE_IMAGE=nvidia/cuda:12.1.1-runtime-ubuntu22.04,TORCH_INDEX_URL=https://download.pytorch.org/whl/cu121,TORCH_VERSION=2.14.1+cu121"
+            TAGS="${IMAGE}:gpu"
+            if [ -n "${{ inputs.tag }}" ]; then
+              TAGS="${TAGS},${IMAGE}:${{ inputs.tag }}-gpu"
+            fi
+          fi
+          {
+            echo "tags=${TAGS}"
+            echo "args=${ARGS}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build e push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./worker
+          file: ./worker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: ${{ steps.meta.outputs.args }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

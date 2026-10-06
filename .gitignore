@@ -1,3 +1,17 @@
 .vercel
 .env*
 .venv/
+# FASE 3F/3G: nunca versionar áudio, modelos, MIDI, cache ou temporários.
+*.wav
+*.mp3
+*.mid
+*.midi
+*.pth
+*.pt
+*.onnx
+*.tflite
+*.bin
+.gpi-models/
+.cache/
+__pycache__/
+*.pyc

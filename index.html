@@ -337,6 +337,34 @@
       </div>
     </section>
 
+    <!-- ÁUDIO → PARTITURA (FASE 3N: pipeline real) -->
+    <section class="section audio2" id="audio-transcrever" aria-labelledby="audio2-titulo">
+      <div class="container">
+        <p class="section__kicker">Áudio real</p>
+        <h2 class="section__title" id="audio2-titulo">Transformar música em partitura</h2>
+        <p class="section__subtitle">Envie um áudio (mp3, wav, flac, ogg, m4a ou aac — até 25 MB) e acompanhe a análise real: instrumentos, BPM, tonalidade e compasso.</p>
+        <div class="audio2__panel">
+          <div class="field">
+            <label class="field__label" for="audio2-file">Arquivo de áudio</label>
+            <input class="field__input" id="audio2-file" name="audio" type="file" accept=".mp3,.wav,.flac,.ogg,.m4a,.aac,audio/*" />
+          </div>
+          <p class="audio2__fileinfo" id="audio2-fileinfo" hidden></p>
+          <div class="audio2__actions">
+            <button class="btn btn--primary" id="audio2-analyze" type="button" disabled>Analisar música</button>
+            <button class="btn btn--ghost" id="audio2-clear" type="button" hidden>Remover</button>
+            <button class="btn btn--ghost" id="audio2-login" type="button" hidden>Fazer login</button>
+          </div>
+          <p class="gen-feedback" id="audio2-feedback" role="status" aria-live="polite" hidden></p>
+          <div class="audio2__progress" id="audio2-progress" hidden>
+            <p class="audio2__stage" id="audio2-stage" role="status" aria-live="polite"></p>
+            <p class="audio2__pct" id="audio2-pct" aria-hidden="true"></p>
+          </div>
+          <div class="audio2__result" id="audio2-result" hidden></div>
+          <div class="audio2__selection" id="audio2-selection" hidden></div>
+        </div>
+      </div>
+    </section>
+
     <!-- FAIXA DE RECURSOS -->
     <section class="features" aria-label="Benefícios">
       <div class="container features__grid">
@@ -657,6 +685,9 @@
     </div>
   </footer>
 
+  <script src="js/instrument-catalog.js" defer></script>
+  <script src="js/audio-transcribe.js" defer></script>
+  <script src="js/audio-selection.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
 </html>

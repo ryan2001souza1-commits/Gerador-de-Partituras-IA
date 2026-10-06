@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+httpx
+numpy==1.26.4
+torch
+torchaudio
+panns-inference
+basic-pitch
+# FASE 3G: basic-pitch 0.4.0 usa TFLite em Linux/Python 3.10
+# (tflite-runtime 2.14.0, incompatível com NumPy 2 — fixado em 1.26.4).
+# pretty-midi/mido/resampy vêm como dependências do basic-pitch.
+# Demucs/FFmpeg são dependências do pipeline (Demucs 4.1.0 via pip,
+# FFmpeg/ffprobe via sistema). Modelo PANNs CNN14 baixado sob demanda
+# da fonte oficial (Zenodo 3987831) para ~/.cache/gpi-models (fora do Git).
