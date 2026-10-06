@@ -26,7 +26,7 @@ FROM ${BASE_IMAGE} AS base
 
 ARG PYTHON_BIN=python3
 ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
-ARG TORCH_VERSION=2.14.1+cpu
+ARG TORCH_VERSION=2.11.0+cpu
 ARG PRELOAD_MODELS=true
 ARG PANNS_URL=https://zenodo.org/record/3987831/files/Cnn14_mAP%3D0.431.pth?download=1
 ARG PANNS_SIZE_BYTES=327428481
